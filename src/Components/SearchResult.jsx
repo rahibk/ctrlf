@@ -1,91 +1,146 @@
-import React, { useState } from "react";
-import AppBar from "@material-ui/core/AppBar";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Grid from "@material-ui/core/Grid";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Link from "@material-ui/core/Link";
-import TextField from "@material-ui/core/TextField";
-import ReactPlayer from 'react-player';
-import dataSteps from '../Data';
+import ReactPlayer from "react-player";
+import MobileStepper from "@material-ui/core/MobileStepper";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+import * as YoutubeClient from "../Clients/YoutubeClient";
 
-const useStyles = makeStyles(theme => ({
-  icon: {
-    marginRight: theme.spacing(2)
-  },
-  heroContent: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6)
-  },
-  heroButtons: {
-    marginTop: theme.spacing(4)
-  },
-  footer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(6)
+export default function SearchResult({ youtubeUrl, keyword }) {
+  const [activeStep, setActiveStep] = useState(0);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [timeStamps, setTimeStamps] = useState([]);
+  const theme = useTheme();
+  const [tutorialSteps, setTutorialSteps] = useState([]);
+  const [videoTranscript, setVideoTranscript] = useState({});
+
+  function extractVideoID(url) {
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match && match[7].length === 11) {
+      return match[7];
+    } else {
+      alert("Invalid Youtube URL");
+    }
   }
-}));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  useEffect(() => {
+    const videoId = extractVideoID(youtubeUrl);
+    callYoutubeClient(videoId);
+  });
 
-export default function MainBody() {
-  const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const maxSteps = dataSteps.tutorialSteps.length;
-  console.log(maxSteps);
+  function callYoutubeClient(id) {
+    YoutubeClient.getTranscript(id)
+      .then(function (response) {
+        setVideoTranscript(response);
+
+        var parser, xmlDoc;
+        var text = response;
+
+        parser = new DOMParser();
+        xmlDoc = parser.parseFromString(text, "text/xml");
+
+        var x = xmlDoc.getElementsByTagName("text");
+        for (var i = 0; i < x.length; i++) {
+          if (x[i].childNodes[0]) {
+            var textSegment = x[i].childNodes[0].nodeValue.toLowerCase();
+            var isFound = textSegment.search(keyword.toLowerCase());
+            if (isFound !== -1) {
+              var timeStamp = timeStamps;
+              timeStamp.push(x[i].getAttribute("start"));
+              setTimeStamps(timeStamp);
+            }
+          }
+        }
+        createTutorialSteps(id);
+        console.log(timeStamps);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  function createTutorialSteps(id) {
+    const baseUrl = "https://www.youtube.com/watch?v=" + id + "&t=";
+    var stepsObj = [];
+    for (var i = 0; i < timeStamps.length; i++) {
+      var stepObj = {
+        imgPath: baseUrl + timeStamps[i],
+      };
+      stepsObj.push(stepObj);
+    }
+    setVideoUrl(stepsObj[0].imgPath);
+    setTutorialSteps(stepsObj);
+  }
+
+  const handleNext = () => {
+    var nextStep = activeStep + 1;
+    setActiveStep(nextStep);
+    setVideoUrl(tutorialSteps[nextStep].imgPath);
+  };
+
+  const handleBack = () => {
+    var prevStep = activeStep - 1;
+    setActiveStep(prevStep);
+    setVideoUrl(tutorialSteps[prevStep].imgPath);
+  };
 
   return (
-    <React.Fragment>
-      <CssBaseline />
-      <AppBar position="relative">
-        <Toolbar>
-          <YoutubeSearchedForIcon className={classes.icon} />
-          <Typography variant="h6" color="inherit" noWrap>
-            Ctrl F
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <main>
-        {/* Hero unit */}
-        <div className={classes.heroContent}>
-          <Container maxWidth="sm">
-            <Typography
-              variant="h5"
-              align="center"
-              color="textSecondary"
-              paragraph
-            >
-                Found 8 results of keyword "economics"
-            </Typography>
-            <div id="result">
-                <ReactPlayer
-                url='https://vimeo.com/243556536'
-                className='react-player'
-                playing
-                width='100%'
-                height='auto'
-                />
-            </div>
-          </Container>
+    <div>
+      <Container maxWidth="sm">
+        <Typography variant="h5" align="center" color="textSecondary" paragraph>
+          Found {timeStamps.length} results of keyword "{keyword}"
+        </Typography>
+        <div id="result">
+          <ReactPlayer
+            url={videoUrl}
+            className="react-player"
+            playing
+            width="auto"
+            controls={true}
+          />
         </div>
-      </main>
-      <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="textSecondary"
-          component="p"
-        >
-          Something here to give the footer a purpose!
-        </Typography>
-      </footer>
-    </React.Fragment>
+        <MobileStepper
+          steps={timeStamps.length}
+          position="static"
+          variant="text"
+          activeStep={activeStep}
+          nextButton={
+            <Button
+              size="small"
+              onClick={handleNext}
+              disabled={activeStep === timeStamps.length - 1}
+            >
+              Next
+              {theme.direction === "rtl" ? (
+                <KeyboardArrowLeft />
+              ) : (
+                <KeyboardArrowRight />
+              )}
+            </Button>
+          }
+          backButton={
+            <Button
+              size="small"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+            >
+              {theme.direction === "rtl" ? (
+                <KeyboardArrowRight />
+              ) : (
+                <KeyboardArrowLeft />
+              )}
+              Back
+            </Button>
+          }
+        />
+      </Container>
+      <Typography variant="h5" align="center" color="textSecondary">
+        Search for another word?
+      </Typography>
+    </div>
   );
 }

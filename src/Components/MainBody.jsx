@@ -1,18 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Grid from "@material-ui/core/Grid";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Link from "@material-ui/core/Link";
+import SearchResult from "./SearchResult";
 import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(theme => ({
@@ -51,8 +46,32 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function MainBody() {
   const classes = useStyles();
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
-  return (
+  function handleClick() {
+    setSearchTriggered(true);
+  }
+
+  function handleKeywordChange(event) {
+    console.log(event.target);
+    if (event.target.value.length > 0) {
+      setKeyword(event.target.value);
+    } else {
+      setKeyword("");
+    }    
+  }
+
+  function handleUrlChange(event) {
+    if (event.target.value.length > 0) {
+      setYoutubeUrl(event.target.value);
+    } else {
+      setYoutubeUrl("");
+    }    
+  }
+
+  return ( 
     <React.Fragment>
       <CssBaseline />
       <AppBar position="relative">
@@ -66,6 +85,7 @@ export default function MainBody() {
       <main>
         {/* Hero unit */}
         <div className={classes.heroContent}>
+        {youtubeUrl.length && keyword.length && searchTriggered ? (<SearchResult youtubeUrl={youtubeUrl} keyword={keyword}/>) : (
           <Container maxWidth="sm">
             <Typography
               component="h1"
@@ -84,27 +104,22 @@ export default function MainBody() {
               paragraph
               
             >
-              Something short and leading about the collection below—its
-              contents, the creator, etc. Make it short and sweet, but not too
-              short so folks don&apos;t simply skip over it entirely.{" "}
+             Don't have time to watch an entire youtube video to find a specific word? Not to worry use this tool to easily find keyword instances in a youtube video!{" "}
             </Typography>
-            <div id="input">
-              <Grid container spacing={2} justify="center">
-                <Grid item xs={2}>
-                  <TextField id="keyword" label="Keyword" placeholder="economics"/>
-                </Grid>
-                <Grid item xs={3}>
-                  <TextField id="url" label="Youtube URL" placeholder="http://youtube.com/YourURL" />
-                </Grid>
-              </Grid>
+            <div id="input" style={{display: "flex", justifyContent:"center" }}>
+                  <TextField style={{ padding: "5px", width: "30%"}} helperText="" error={keyword.length === 0} onChange={handleKeywordChange} id="keyword" label="Keyword" placeholder="economics"/>
+                  <TextField style={{ padding: "5px", width: "50%"}} helperText="" error={youtubeUrl.length === 0} onChange={handleUrlChange} id="url" label="Youtube URL" placeholder="http://youtube.com/YourURL" />
+                  </div>
               <div className={classes.heroButtons}>
-                <Button variant="contained" color="primary">
-                  Ctrl-F
+                <Button  onClick={handleClick} variant="contained" color="primary">
+                  Search
                 </Button>
               </div>
-            </div>
+
           </Container>
+          )}
         </div>
+
       </main>
       <footer className={classes.footer}>
         <Typography variant="h6" align="center" gutterBottom>

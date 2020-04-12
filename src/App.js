@@ -1,8 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import MainBody from "./Components/MainBody";
-import SearchResult from "./Components/SearchResult";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 
 const theme = createMuiTheme({
@@ -30,12 +28,27 @@ const theme = createMuiTheme({
 
 function App() {
   return (
-    <div className="App">
-    <ThemeProvider theme={theme}>
-      {/* <MainBody /> */}
-      <SearchResult/>
-    </ThemeProvider>
-  </div>
+    // <Router>
+    // <Switch>
+    //   <Route path="/">
+    //     <div className="App">
+    //       <ThemeProvider theme={theme}>
+    //         <MainBody />
+    //       </ThemeProvider>
+    // //     </div>
+    // //   </Route>
+          
+    //       <Route path="/search">
+          <div className="App">
+          <ThemeProvider theme={theme}>
+            <MainBody />
+          </ThemeProvider>
+        </div>
+  //     </Route>
+
+    
+  // </Switch>
+  //     </Router>
   );
 }
 
