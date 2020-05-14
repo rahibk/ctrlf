@@ -30,7 +30,7 @@ export default function SearchResult({ youtubeUrl, keyword }) {
   useEffect(() => {
     const videoId = extractVideoID(youtubeUrl);
     callYoutubeClient(videoId);
-  });
+  }, []);
 
   function callYoutubeClient(id) {
     YoutubeClient.getTranscript(id)
@@ -38,7 +38,7 @@ export default function SearchResult({ youtubeUrl, keyword }) {
         setVideoTranscript(response);
 
         var parser, xmlDoc;
-        var text = response;
+        var text = response;c
 
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(text, "text/xml");
