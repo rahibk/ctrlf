@@ -95,7 +95,7 @@ export default function MainBody() {
         <Toolbar>
           <YoutubeSearchedForIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
-            Ctrl F
+            Ctrl+F
           </Typography>
         </Toolbar>
       </AppBar>
@@ -112,7 +112,7 @@ export default function MainBody() {
               gutterBottom
               
             >
-              Ctrl F
+              Ctrl + F
             </Typography>
             <Typography
               variant="h5"

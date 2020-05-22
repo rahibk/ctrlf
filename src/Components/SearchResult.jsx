@@ -141,7 +141,7 @@ export default function SearchResult({ youtubeUrl, keyword, setSearchTriggered }
           }
         />
       </Container>
-      <Button style={{marginTop: "20px"}} variant="contained" color="primary" onClick={setSearchTriggered(true)}>New Search</Button>
+      <Button style={{marginTop: "20px"}} variant="contained" color="primary" onClick={() => setSearchTriggered(false)}>New Search</Button>
     </div>
   );
 }
