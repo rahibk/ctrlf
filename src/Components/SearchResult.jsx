@@ -9,7 +9,7 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import * as YoutubeClient from "../Clients/YoutubeClient";
 
-export default function SearchResult({ youtubeUrl, keyword }) {
+export default function SearchResult({ youtubeUrl, keyword, setSearchTriggered }) {
   const [activeStep, setActiveStep] = useState(0);
   const [videoUrl, setVideoUrl] = useState("");
   const [timeStamps, setTimeStamps] = useState([]);
@@ -35,8 +35,11 @@ export default function SearchResult({ youtubeUrl, keyword }) {
   function callYoutubeClient(id) {
     YoutubeClient.getTranscript(id)
       .then(function (response) {
+        if (response.length === 0) {
+          alert("No captions available. Please try another video.");
+          window.location.reload();
+        }
         setVideoTranscript(response);
-
         var parser, xmlDoc;
         var text = response;
 
@@ -138,9 +141,7 @@ export default function SearchResult({ youtubeUrl, keyword }) {
           }
         />
       </Container>
-      <Typography variant="h5" align="center" color="textSecondary">
-        Search for another word?
-      </Typography>
+      <Button style={{marginTop: "20px"}} variant="contained" color="primary" onClick={setSearchTriggered(true)}>New Search</Button>
     </div>
   );
 }

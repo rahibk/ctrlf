@@ -16,7 +16,9 @@ const useStyles = makeStyles(theme => ({
   },
   heroContent: {
     backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6)
+    padding: theme.spacing(8, 0, 6),
+    height: "80vh",
+    overflow: "hidden"
   },
   heroButtons: {
     marginTop: theme.spacing(4)
@@ -50,8 +52,23 @@ export default function MainBody() {
   const [keyword, setKeyword] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
 
+  function isValidURL() {
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = youtubeUrl.match(regExp);
+    if (match && match[7].length === 11) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   function handleClick() {
-    setSearchTriggered(true);
+    if (isValidURL()) {
+      setSearchTriggered(true);
+    }
+    else {
+      alert("Invalid youtube URL");
+    }
   }
 
   function handleKeywordChange(event) {
@@ -82,10 +99,10 @@ export default function MainBody() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <main>
+      <main >
         {/* Hero unit */}
         <div className={classes.heroContent}>
-        {youtubeUrl.length && keyword.length && searchTriggered ? (<SearchResult youtubeUrl={youtubeUrl} keyword={keyword}/>) : (
+        {youtubeUrl.length && keyword.length && searchTriggered ? (<SearchResult youtubeUrl={youtubeUrl} keyword={keyword} setSearchTriggered={setSearchTriggered}/>) : (
           <Container maxWidth="sm">
             <Typography
               component="h1"
@@ -104,17 +121,21 @@ export default function MainBody() {
               paragraph
               
             >
-             Don't have time to watch an entire youtube video to find a specific word? Not to worry use this tool to easily find keyword instances in a youtube video!{" "}
+             Don't have time to watch an entire youtube video to find a specific word? Use this!{" "}
             </Typography>
+            <form>
+
             <div id="input" style={{display: "flex", justifyContent:"center" }}>
                   <TextField style={{ padding: "5px", width: "30%"}} helperText="" error={keyword.length === 0} onChange={handleKeywordChange} id="keyword" label="Keyword" placeholder="economics"/>
-                  <TextField style={{ padding: "5px", width: "50%"}} helperText="" error={youtubeUrl.length === 0} onChange={handleUrlChange} id="url" label="Youtube URL" placeholder="http://youtube.com/YourURL" />
+                  <TextField style={{ padding: "5px", width: "50%"}} helperText="" error={youtubeUrl.length === 0} onChange={handleUrlChange} id="url" label="Youtube URL" placeholder="http://youtube.com/videoid" />
                   </div>
               <div className={classes.heroButtons}>
-                <Button  onClick={handleClick} variant="contained" color="primary">
+                <Button  type="submit" onClick={handleClick} variant="contained" color="primary">
                   Search
                 </Button>
               </div>
+              </form>
+
 
           </Container>
           )}
@@ -122,16 +143,13 @@ export default function MainBody() {
 
       </main>
       <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
         <Typography
           variant="subtitle1"
           align="center"
           color="textSecondary"
           component="p"
         >
-          Something here to give the footer a purpose!
+         <a href="https://github.com/rahibk/ctrlf">View Source</a>
         </Typography>
       </footer>
     </React.Fragment>
