@@ -1,11 +1,6 @@
 {
   "name": "ctrlf",
   "version": "0.1.0",
-  "private": true,
-  "engines": {
-    "npm": "6.14.4",
-    "node": "12.16.3"
-  },
   "dependencies": {
     "@material-ui/core": "^4.9.4",
     "@material-ui/icons": "^4.9.1",
