@@ -38,7 +38,7 @@ export default function SearchResult({ youtubeUrl, keyword }) {
         setVideoTranscript(response);
 
         var parser, xmlDoc;
-        var text = response;c
+        var text = response;
 
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(text, "text/xml");
